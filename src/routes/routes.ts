@@ -4,7 +4,7 @@ import { clockIn, clockOut } from "../controllers/appController";
 
 const router = express.Router();
 
-router.route("/clickIn").post(clockIn);
+router.route("/clockIn").get(clockIn);
 router.route("/clockOut").post(clockOut);
 
-module.exports = router;
+export default router;
