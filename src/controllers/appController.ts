@@ -1,7 +1,8 @@
 import { Response, Request } from "express";
-import { Year, Month, DayType } from "./../models/appModel";
+import { Year, Month } from "./../models/appModel";
 import { dates } from "../helpers/dates";
 import { createDay } from "./../helpers/timeUnits";
+
 export const clockIn = async (req: Request, res: Response) => {
   try {
     const { curYear, curMonth } = dates();
@@ -41,8 +42,21 @@ export const clockIn = async (req: Request, res: Response) => {
   }
 };
 
-export const clockOut = (req: Request, res: Response) => {
+export const clockOut = async (req: Request, res: Response) => {
   try {
+    const { curYear, curMonth, curDay, timeMilisecond } = dates();
+
+    // I want to fint the current day, to update end and caculate duration
+    const yearCollection = await Year.findOne({ year: curYear });
+    const months = yearCollection?.months.filter((obj) => obj.month === curMonth);
+    let day = months?.[0].days.find((day) => day.number === curDay);
+
+    if (day && day.start) {
+      day.end = timeMilisecond;
+      day.duration = day.end - day.start;
+    }
+    await yearCollection?.save();
+
     res.status(200).json({
       status: "success",
       body: {
