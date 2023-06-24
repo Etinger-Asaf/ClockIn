@@ -7,7 +7,6 @@ type dateType = {
   timeMilisecond: number;
 };
 
-const date = new Date();
 const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const monthNames = [
   "January",
@@ -24,6 +23,8 @@ const monthNames = [
   "December",
 ];
 export function dates(): dateType {
+  const date = new Date();
+
   const curYear = date.getFullYear();
   const curMonth = date.getMonth();
   const curDay = date.getDate();

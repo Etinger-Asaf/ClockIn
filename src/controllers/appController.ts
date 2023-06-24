@@ -1,6 +1,8 @@
 import { Response, Request } from "express";
 import { Year, Month, Day, DayType, MonthType, YearType } from "./../models/appModel";
 import { dates } from "../helpers/dates";
+import BaseError from "../baseError";
+import "dotenv/config";
 
 export const clockIn = async (req: Request, res: Response) => {
   try {
@@ -21,7 +23,7 @@ export const clockIn = async (req: Request, res: Response) => {
 
       await newYear.save();
     } else {
-      // If yearCollectino exists, we search for the month
+      // If yearCollection exists, we search for the month
       let foundMonth = yearCollection.months.find((obj) => obj.month === curMonth);
 
       // month is not exists, we create a new month
@@ -34,8 +36,7 @@ export const clockIn = async (req: Request, res: Response) => {
       if (foundMonth) {
         for (let day in foundMonth.days) {
           if (foundMonth.days[day].number === curDay) {
-            console.log("This day has already started");
-            throw new Error("This day is already exists");
+            throw new BaseError(400, "This shift has already started", true);
           }
         }
       }
@@ -51,12 +52,11 @@ export const clockIn = async (req: Request, res: Response) => {
       },
     });
   } catch (e) {
-    console.log(e, "this is the error");
     // need to check the current status code and how to create the right error
-    res.status(200).json({
-      status: "failed",
+    res.status((e as BaseError).statusCode).json({
+      status: (e as BaseError).status,
       body: {
-        message: "This day already exists",
+        message: (e as BaseError).message,
       },
     });
   }
@@ -66,14 +66,16 @@ export const clockOut = async (req: Request, res: Response) => {
   try {
     const { curYear, curMonth, curDay, timeMilisecond } = dates();
 
-    // I want to fint the current day, to update end and caculate duration
+    // I want to find the current day, to update end and caculate duration
     const yearCollection = await Year.findOne({ year: curYear });
     const months = yearCollection?.months.filter((obj) => obj.month === curMonth);
     let day = months?.[0].days.find((day) => day.number === curDay);
 
-    if (day && day.start) {
+    if (day && day.start && !day.end) {
       day.end = timeMilisecond;
       day.duration = day.end - day.start;
+    } else {
+      throw new BaseError(404, `This shift has already ended`, true);
     }
     await yearCollection?.save();
 
@@ -84,6 +86,74 @@ export const clockOut = async (req: Request, res: Response) => {
       },
     });
   } catch (e) {
-    console.log(e, "this is also an error");
+    res.status((e as BaseError).statusCode).json({
+      status: (e as BaseError).status,
+      body: {
+        message: (e as BaseError).message,
+      },
+    });
+  }
+};
+
+export const monthSalary = async (req: Request, res: Response) => {
+  try {
+    const { curYear, curMonth } = dates();
+
+    const durationSum = await Year.aggregate([
+      { $match: { year: { $eq: curYear } } },
+      { $unwind: "$months" },
+      { $match: { "months.month": curMonth } },
+      { $unwind: "$months.days" },
+      {
+        $group: {
+          _id: null,
+          totalDuration: { $sum: "$months.days.duration" },
+        },
+      },
+    ]);
+
+    const totalDuration = durationSum?.[0].totalDuration;
+
+    type monthlyData = {
+      salary: number;
+      hours: number;
+      minutes: number;
+    };
+
+    const calcWorkTime = (time: number): monthlyData => {
+      if (time <= 0) throw new BaseError(404, "Duration was smaller or equals to zero", true);
+
+      const totalTime = Math.floor(time / 60000);
+      const hours = Math.floor(totalTime / 60);
+      const minutes = totalTime % 60;
+      const hourPay = +process.env.HOURPAY!;
+      const payPerMinute = hourPay / 60;
+      const minutesSalary = minutes * payPerMinute;
+      const salary = Math.floor(hours * hourPay + minutesSalary);
+      return { salary, hours, minutes };
+    };
+
+    const { salary, hours, minutes } = calcWorkTime(totalDuration);
+
+    // if (!daysArray) {
+    //   throw new BaseError(404, "Year collection is not exists", true);
+    // }
+
+    res.status(200).json({
+      status: "success",
+      body: {
+        message: "This is the monthly salary for now",
+        salary,
+        hours,
+        minutes,
+      },
+    });
+  } catch (e) {
+    res.status((e as BaseError).statusCode).json({
+      status: (e as BaseError).status,
+      body: {
+        message: (e as BaseError).message,
+      },
+    });
   }
 };
