@@ -2,9 +2,11 @@
   "name": "clockin",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/app.js",
+  "main": "dist/main.js",
+  "type": "module",
   "scripts": {
-    "start:dev": "npx nodemon"
+    "start:dev": "npx nodemon",
+    "start:build": "npx tsc"
   },
   "author": "",
   "license": "ISC",

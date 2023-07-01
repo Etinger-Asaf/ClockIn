@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Document } from "mongoose";
 
 export type DayType = {
   day: string;
@@ -14,8 +14,6 @@ export type MonthType = {
   days: DayType[];
 };
 
-// I need to sppecify YearType as an extended of mongoose Document becouse when creating a new year I want to make shure
-// the year I am getting is in the right format and to preform a .save() I have to make sure it is a mongoose Document type
 export interface YearType extends Document {
   year: number;
   months: MonthType[];
