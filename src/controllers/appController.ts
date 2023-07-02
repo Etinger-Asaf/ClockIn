@@ -111,13 +111,15 @@ export const monthSalary = async (req: Request, res: Response) => {
       },
     ]);
 
-    const totalDuration = durationSum?.[0].totalDuration;
+    const totalDuration: number = durationSum?.[0].totalDuration;
 
-    const { salary, hours, minutes } = calculateSalaryAndTime(totalDuration);
+    const year = await Year.findOne({ year: curYear });
 
-    // if (!daysArray) {
-    //   throw new BaseError(404, "Year collection is not exists", true);
-    // }
+    const days = year?.months.filter((obj) => obj.month === curMonth).length;
+
+    if (!totalDuration || !days) throw new BaseError(500, `Days or Duration were missing`, false);
+
+    const { salary, hours, minutes } = calculateSalaryAndTime(totalDuration, days);
 
     res.status(200).json({
       status: "success",
