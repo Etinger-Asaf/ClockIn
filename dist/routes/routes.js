@@ -9,9 +9,4 @@ const router = express_1.default.Router();
 router.route("/clockIn").get(appController_1.clockIn);
 router.route("/clockOut").get(appController_1.clockOut);
 router.route("/monthSalary").get(appController_1.monthSalary);
-//===================================
-// APIs I want to implament
-// Getting this month salary sum.
-// Getting this month working time, in hours and minutes.
-//===================================
 exports.default = router;
