@@ -115,11 +115,12 @@ export const monthSalary = async (req: Request, res: Response) => {
 
     const year = await Year.findOne({ year: curYear });
 
-    const days = year?.months.filter((obj) => obj.month === curMonth).length;
-
+    const month = year?.months.filter((obj) => obj.month === curMonth);
+    const days = month?.[0]?.days.length;
     if (!totalDuration || !days) throw new BaseError(500, `Days or Duration were missing`, false);
 
-    const { salary, hours, minutes } = calculateSalaryAndTime(totalDuration, days);
+    const { salary, hours, minutes, transport, socialSecurity, pension, irs, health, neto } =
+      calculateSalaryAndTime(totalDuration, days);
 
     res.status(200).json({
       status: "success",
@@ -128,6 +129,12 @@ export const monthSalary = async (req: Request, res: Response) => {
         salary,
         hours,
         minutes,
+        transport,
+        socialSecurity,
+        pension,
+        irs,
+        health,
+        neto,
       },
     });
   } catch (e) {
