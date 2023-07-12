@@ -103,6 +103,7 @@ const clockOut = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.clockOut = clockOut;
 const monthSalary = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     try {
         const { curYear, curMonth } = (0, dates_1.dates)();
         const durationSum = yield appModel_1.Year.aggregate([
@@ -118,10 +119,12 @@ const monthSalary = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             },
         ]);
         const totalDuration = durationSum === null || durationSum === void 0 ? void 0 : durationSum[0].totalDuration;
-        const { salary, hours, minutes } = (0, salary_1.default)(totalDuration);
-        // if (!daysArray) {
-        //   throw new BaseError(404, "Year collection is not exists", true);
-        // }
+        const year = yield appModel_1.Year.findOne({ year: curYear });
+        const month = year === null || year === void 0 ? void 0 : year.months.filter((obj) => obj.month === curMonth);
+        const days = (_a = month === null || month === void 0 ? void 0 : month[0]) === null || _a === void 0 ? void 0 : _a.days.length;
+        if (!totalDuration || !days)
+            throw new baseError_1.default(500, `Days or Duration were missing`, false);
+        const { salary, hours, minutes, transport, socialSecurity, pension, irs, health, neto } = (0, salary_1.default)(totalDuration, days);
         res.status(200).json({
             status: "success",
             body: {
@@ -129,6 +132,12 @@ const monthSalary = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 salary,
                 hours,
                 minutes,
+                transport,
+                socialSecurity,
+                pension,
+                irs,
+                health,
+                neto,
             },
         });
     }

@@ -125,7 +125,7 @@ export const monthSalary = async (req: Request, res: Response) => {
     res.status(200).json({
       status: "success",
       body: {
-        message: "This is the monthly salary for now, and I change to check",
+        message: "This is the monthly salary for now",
         salary,
         hours,
         minutes,
