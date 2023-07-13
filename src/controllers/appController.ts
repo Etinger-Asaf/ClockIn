@@ -3,6 +3,7 @@ import { Year, Month, Day, DayType, MonthType, YearType } from "./../models/appM
 import { dates } from "../helpers/dates";
 import BaseError from "../baseError";
 import calculateSalaryAndTime from ".././helpers/salary";
+import createMonthSumFile from "../helpers/monthSum";
 export const clockIn = async (req: Request, res: Response) => {
   try {
     const { curYear, curMonth, curDay, namedDay, timeMilisecond, namedMonth } = dates();
@@ -29,6 +30,9 @@ export const clockIn = async (req: Request, res: Response) => {
       if (!foundMonth) {
         foundMonth = yearCollection.months.create({ month: curMonth });
         yearCollection.months.push(foundMonth);
+
+        // Not sure it need to be here, when a month is missing it means we have change a month
+        createMonthSumFile(curMonth, curYear);
       }
 
       // month exists, we checking this if current day is already exists
@@ -117,6 +121,7 @@ export const monthSalary = async (req: Request, res: Response) => {
 
     const month = year?.months.filter((obj) => obj.month === curMonth);
     const days = month?.[0]?.days.length;
+
     if (!totalDuration || !days) throw new BaseError(500, `Days or Duration were missing`, false);
 
     const { salary, hours, minutes, transport, socialSecurity, pension, irs, health, neto } =
