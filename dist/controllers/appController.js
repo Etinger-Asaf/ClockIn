@@ -17,6 +17,7 @@ const appModel_1 = require("./../models/appModel");
 const dates_1 = require("../helpers/dates");
 const baseError_1 = __importDefault(require("../baseError"));
 const salary_1 = __importDefault(require(".././helpers/salary"));
+const monthSum_1 = __importDefault(require("../helpers/monthSum"));
 const clockIn = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { curYear, curMonth, curDay, namedDay, timeMilisecond, namedMonth } = (0, dates_1.dates)();
@@ -40,6 +41,8 @@ const clockIn = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             if (!foundMonth) {
                 foundMonth = yearCollection.months.create({ month: curMonth });
                 yearCollection.months.push(foundMonth);
+                // Not sure it need to be here, when a month is missing it means we have change a month
+                (0, monthSum_1.default)(curMonth, curYear);
             }
             // month exists, we checking this if current day is already exists
             if (foundMonth) {
@@ -128,7 +131,7 @@ const monthSalary = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         res.status(200).json({
             status: "success",
             body: {
-                message: "This is the monthly salary for now, and I change to check",
+                message: "This is the monthly salary for now",
                 salary,
                 hours,
                 minutes,
