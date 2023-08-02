@@ -26,7 +26,8 @@ async function createMonthSumFile(curMonth: number, curYear: number): Promise<vo
     //Geeting the new current month and subtract 1 for calculating the previous month
     if (curMonth === 1) {
       curMonth = 12;
-    } else --curMonth;
+      --curYear;
+    } else curMonth -= 2;
 
     const year = await Year.findOne({ year: curYear });
     const month = year?.months.filter((obj) => obj.month === curMonth);
@@ -80,7 +81,9 @@ async function createMonthSumFile(curMonth: number, curYear: number): Promise<vo
       sendEmail();
     }
   } catch (e) {
-    console.log(e, "This error is from the monthSum file");
+    // console.log(e, "This error is from the monthSum file");
+    const newError = new BaseError(404, "Something went wrong with the mailer", false);
+    throw newError;
   }
 }
 

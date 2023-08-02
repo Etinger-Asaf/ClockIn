@@ -19,7 +19,7 @@ type monthData = {
   neto: number;
 };
 
-const calculateSalaryAndTime = (duration: number, days: number): monthData => {
+export const calculateSalaryAndTime = (duration: number, days: number): monthData => {
   if (duration <= 0) throw new BaseError(404, "Duration was smaller or equals to zero", true);
 
   const totalMin = Math.floor(duration / 60000); // Give my my working time in minutes.

@@ -7,11 +7,11 @@ import createMonthSumFile from "../helpers/monthSum";
 export const clockIn = async (req: Request, res: Response) => {
   try {
     const { curYear, curMonth, curDay, namedDay, timeMilisecond, namedMonth } = dates();
+    console.log(curYear, curMonth, curDay, namedDay, timeMilisecond, namedMonth, "this is it");
     //Checking if current year exists
     let yearCollection = await Year.findOne({ year: curYear });
     // Creating a day
     const newDay: DayType = new Day({ day: namedDay, number: curDay, start: timeMilisecond });
-
     if (!yearCollection) {
       //Creating a year
       const newYear: YearType = new Year({ year: curYear });
@@ -28,7 +28,9 @@ export const clockIn = async (req: Request, res: Response) => {
 
       // month is not exists, we create a new month
       if (!foundMonth) {
-        foundMonth = yearCollection.months.create({ month: curMonth });
+        console.log("no month");
+        foundMonth = yearCollection.months.create({ name: namedMonth, month: curMonth });
+        console.log(foundMonth);
         yearCollection.months.push(foundMonth);
 
         // Not sure it need to be here, when a month is missing it means we have change a month
@@ -56,7 +58,7 @@ export const clockIn = async (req: Request, res: Response) => {
     });
   } catch (e) {
     // need to check the current status code and how to create the right error
-    res.status((e as BaseError).statusCode).json({
+    res.status(404).json({
       status: (e as BaseError).status,
       body: {
         message: (e as BaseError).message,
@@ -89,7 +91,7 @@ export const clockOut = async (req: Request, res: Response) => {
       },
     });
   } catch (e) {
-    res.status((e as BaseError).statusCode).json({
+    res.status(404).json({
       status: (e as BaseError).status,
       body: {
         message: (e as BaseError).message,
@@ -100,8 +102,8 @@ export const clockOut = async (req: Request, res: Response) => {
 
 export const monthSalary = async (req: Request, res: Response) => {
   try {
-    const { curYear, curMonth } = dates();
-
+    let { curYear, curMonth } = dates();
+    console.log(curMonth);
     const durationSum = await Year.aggregate([
       { $match: { year: { $eq: curYear } } },
       { $unwind: "$months" },
@@ -143,7 +145,9 @@ export const monthSalary = async (req: Request, res: Response) => {
       },
     });
   } catch (e) {
-    res.status((e as BaseError).statusCode).json({
+    // res.status((e as BaseError).statusCode).json({
+    console.log(e, "e");
+    res.status(404).json({
       status: (e as BaseError).status,
       body: {
         message: (e as BaseError).message,

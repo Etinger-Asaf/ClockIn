@@ -4,3 +4,5 @@ node_modules/
 .cache
 .config
 *.xlsx
+*.test.ts
+selfExplentions.txt
