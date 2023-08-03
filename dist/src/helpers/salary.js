@@ -10,13 +10,10 @@ const calculateSalaryAndTime = (duration, days) => {
     if (duration <= 0)
         throw new baseError_1.default(404, "Duration was smaller or equals to zero", true);
     const totalMin = Math.floor(duration / 60000); // Give my my working time in minutes.
-    console.log(totalMin, "total");
     const minutes = totalMin % 60;
-    console.log(minutes, "minutes");
     const hours = Math.floor(totalMin / 60);
     const hourPay = +process.env.HOURPAY; // Hour rate.
     let salary = hours * hourPay + (hourPay / 100) * minutes; // Calculate salary payment.
-    console.log(salary, "salary");
     const transport = days * 11; // Calculate transport payment.
     salary += transport;
     const pension = Math.floor(salary * 0.06);

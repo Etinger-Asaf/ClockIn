@@ -59,9 +59,9 @@ export const clockIn = async (req: Request, res: Response) => {
   } catch (e) {
     // need to check the current status code and how to create the right error
     res.status(404).json({
-      status: (e as BaseError).status,
+      status: "Failed",
       body: {
-        message: (e as BaseError).message,
+        message: "Something went wrong with the ClockIn API",
       },
     });
   }
@@ -92,9 +92,9 @@ export const clockOut = async (req: Request, res: Response) => {
     });
   } catch (e) {
     res.status(404).json({
-      status: (e as BaseError).status,
+      status: "Failed",
       body: {
-        message: (e as BaseError).message,
+        message: "Something went wrong with the ClockOut API",
       },
     });
   }
@@ -103,7 +103,7 @@ export const clockOut = async (req: Request, res: Response) => {
 export const monthSalary = async (req: Request, res: Response) => {
   try {
     let { curYear, curMonth } = dates();
-    console.log(curMonth);
+    // console.log(curMonth);
     const durationSum = await Year.aggregate([
       { $match: { year: { $eq: curYear } } },
       { $unwind: "$months" },
@@ -146,11 +146,11 @@ export const monthSalary = async (req: Request, res: Response) => {
     });
   } catch (e) {
     // res.status((e as BaseError).statusCode).json({
-    console.log(e, "e");
+    // console.log(e, "e");
     res.status(404).json({
-      status: (e as BaseError).status,
+      status: "Failed",
       body: {
-        message: (e as BaseError).message,
+        message: "Something went wrong in the monthSalary API",
       },
     });
   }
