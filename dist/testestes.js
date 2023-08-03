@@ -13,11 +13,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.monthSalary = exports.clockOut = exports.clockIn = void 0;
-const appModel_1 = require("./../models/appModel");
-const dates_1 = require("../helpers/dates");
-const baseError_1 = __importDefault(require("../baseError"));
-const salary_1 = __importDefault(require(".././helpers/salary"));
-const monthSum_1 = __importDefault(require("../helpers/monthSum"));
+const appModel_1 = require("./src/models/appModel");
+const dates_1 = require("./src/helpers/dates");
+const baseError_1 = __importDefault(require("./src/baseError"));
+const salary_1 = __importDefault(require("./src/helpers/salary"));
+const monthSum_1 = __importDefault(require("./src/helpers/monthSum"));
 const clockIn = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { curYear, curMonth, curDay, namedDay, timeMilisecond, namedMonth } = (0, dates_1.dates)();
@@ -155,3 +155,5 @@ const monthSalary = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.monthSalary = monthSalary;
+///test
+///another

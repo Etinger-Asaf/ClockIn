@@ -141,7 +141,7 @@ export const monthSalary = async (req: Request, res: Response) => {
         neto,
       },
     });
-  } catch (e) {
+  } catch {
     res.status(404).json({
       status: "Failed",
       body: {
