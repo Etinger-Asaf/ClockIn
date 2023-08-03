@@ -103,7 +103,6 @@ export const clockOut = async (req: Request, res: Response) => {
 export const monthSalary = async (req: Request, res: Response) => {
   try {
     let { curYear, curMonth } = dates();
-    // console.log(curMonth);
     const durationSum = await Year.aggregate([
       { $match: { year: { $eq: curYear } } },
       { $unwind: "$months" },
@@ -145,8 +144,6 @@ export const monthSalary = async (req: Request, res: Response) => {
       },
     });
   } catch (e) {
-    // res.status((e as BaseError).statusCode).json({
-    // console.log(e, "e");
     res.status(404).json({
       status: "Failed",
       body: {

@@ -6,6 +6,8 @@ import * as fs from "fs";
 XLSX.set_fs(fs);
 import { Readable } from "stream";
 XLSX.stream.set_readable(Readable);
+import * as ExcelJS from "exceljs";
+import { buffer } from "stream/consumers";
 
 const monthNames = [
   "January",
@@ -49,36 +51,81 @@ async function createMonthSumFile(curMonth: number, curYear: number): Promise<vo
       return returnObj;
     });
 
+    // // Creating the excel file.
+    // if (daysData) {
+    //   const worksheet = XLSX.utils.json_to_sheet(daysData);
+    //   const workbook = XLSX.utils.book_new();
+    //   XLSX.utils.book_append_sheet(workbook, worksheet, "Dates");
+    //   const tempFile = XLSX.write(workbook, { bookType: "xlsx", type: "buffer" });
+
+    //   // Setting NodeMail and sending the email
+    //   const transporter = nodemailer.createTransport({
+    //     host: "smtp-relay.brevo.com",
+    //     port: 587,
+    //     secure: false,
+    //     auth: {
+    //       user: process.env.LOGIN,
+    //       pass: process.env.SMTPPASSWORD,
+    //     },
+    //   });
+
+    //   async function sendEmail() {
+    //     const info = await transporter.sendMail({
+    //       from: `${process.env.LOGIN}`,
+    //       to: `${process.env.LOGIN}`,
+    //       subject: `${monthNames[curMonth]} - ${curYear}`,
+    //       attachments: [
+    //         { filename: `${monthNames[curMonth]} - ${curYear}.xlsx`, content: tempFile },
+    //       ],
+    //     });
+    //   }
+
+    //   sendEmail();
     // Creating the excel file.
+
+    //====================================================
+    //xlsx above
+    //====================================================
     if (daysData) {
-      const worksheet = XLSX.utils.json_to_sheet(daysData);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Dates");
-      const tempFile = XLSX.write(workbook, { bookType: "xlsx", type: "buffer" });
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet("Dates");
+      worksheet.columns = [
+        { header: "Day", key: "day" },
+        { header: "Number", key: "number" },
+        { header: "Duration", key: "duration" },
+        { header: "Day Salary", key: "daySalary" },
+      ];
+      worksheet.addRows(daysData);
 
-      // Setting NodeMail and sending the email
-      const transporter = nodemailer.createTransport({
-        host: "smtp-relay.brevo.com",
-        port: 587,
-        secure: false,
-        auth: {
-          user: process.env.LOGIN,
-          pass: process.env.SMTPPASSWORD,
-        },
-      });
-
-      async function sendEmail() {
-        const info = await transporter.sendMail({
-          from: `${process.env.LOGIN}`,
-          to: `${process.env.LOGIN}`,
-          subject: `${monthNames[curMonth]} - ${curYear}`,
-          attachments: [
-            { filename: `${monthNames[curMonth]} - ${curYear}.xlsx`, content: tempFile },
-          ],
+      // Convert the workbook to a buffer
+      workbook.xlsx.writeBuffer().then((tempFile) => {
+        // Send the email with the Excel file as an attachment
+        const transporter = nodemailer.createTransport({
+          host: "smtp-relay.brevo.com",
+          port: 587,
+          secure: false,
+          auth: {
+            user: process.env.LOGIN,
+            pass: process.env.SMTPPASSWORD,
+          },
         });
-      }
 
-      sendEmail();
+        async function sendEmail() {
+          const info = await transporter.sendMail({
+            from: `${process.env.LOGIN}`,
+            to: `${process.env.LOGIN}`,
+            subject: `${monthNames[curMonth]} - ${curYear}`,
+            attachments: [
+              {
+                filename: `${monthNames[curMonth]} - ${curYear}.xlsx`,
+                content: tempFile as Buffer,
+              },
+            ],
+          });
+        }
+
+        sendEmail();
+      });
     }
   } catch (e) {
     // console.log(e, "This error is from the monthSum file");

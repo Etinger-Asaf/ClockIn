@@ -43,6 +43,7 @@ const fs = __importStar(require("fs"));
 XLSX.set_fs(fs);
 const stream_1 = require("stream");
 XLSX.stream.set_readable(stream_1.Readable);
+const ExcelJS = __importStar(require("exceljs"));
 const monthNames = [
     "January",
     "February",
@@ -83,35 +84,76 @@ function createMonthSumFile(curMonth, curYear) {
                 const returnObj = { day: day.day, number: day.number, duration, daySalary };
                 return returnObj;
             });
+            // // Creating the excel file.
+            // if (daysData) {
+            //   const worksheet = XLSX.utils.json_to_sheet(daysData);
+            //   const workbook = XLSX.utils.book_new();
+            //   XLSX.utils.book_append_sheet(workbook, worksheet, "Dates");
+            //   const tempFile = XLSX.write(workbook, { bookType: "xlsx", type: "buffer" });
+            //   // Setting NodeMail and sending the email
+            //   const transporter = nodemailer.createTransport({
+            //     host: "smtp-relay.brevo.com",
+            //     port: 587,
+            //     secure: false,
+            //     auth: {
+            //       user: process.env.LOGIN,
+            //       pass: process.env.SMTPPASSWORD,
+            //     },
+            //   });
+            //   async function sendEmail() {
+            //     const info = await transporter.sendMail({
+            //       from: `${process.env.LOGIN}`,
+            //       to: `${process.env.LOGIN}`,
+            //       subject: `${monthNames[curMonth]} - ${curYear}`,
+            //       attachments: [
+            //         { filename: `${monthNames[curMonth]} - ${curYear}.xlsx`, content: tempFile },
+            //       ],
+            //     });
+            //   }
+            //   sendEmail();
             // Creating the excel file.
+            //====================================================
+            //xlsx above
+            //====================================================
             if (daysData) {
-                const worksheet = XLSX.utils.json_to_sheet(daysData);
-                const workbook = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(workbook, worksheet, "Dates");
-                const tempFile = XLSX.write(workbook, { bookType: "xlsx", type: "buffer" });
-                // Setting NodeMail and sending the email
-                const transporter = nodemailer_1.default.createTransport({
-                    host: "smtp-relay.brevo.com",
-                    port: 587,
-                    secure: false,
-                    auth: {
-                        user: process.env.LOGIN,
-                        pass: process.env.SMTPPASSWORD,
-                    },
-                });
-                function sendEmail() {
-                    return __awaiter(this, void 0, void 0, function* () {
-                        const info = yield transporter.sendMail({
-                            from: `${process.env.LOGIN}`,
-                            to: `${process.env.LOGIN}`,
-                            subject: `${monthNames[curMonth]} - ${curYear}`,
-                            attachments: [
-                                { filename: `${monthNames[curMonth]} - ${curYear}.xlsx`, content: tempFile },
-                            ],
-                        });
+                const workbook = new ExcelJS.Workbook();
+                const worksheet = workbook.addWorksheet("Dates");
+                worksheet.columns = [
+                    { header: "Day", key: "day" },
+                    { header: "Number", key: "number" },
+                    { header: "Duration", key: "duration" },
+                    { header: "Day Salary", key: "daySalary" },
+                ];
+                worksheet.addRows(daysData);
+                // Convert the workbook to a buffer
+                workbook.xlsx.writeBuffer().then((tempFile) => {
+                    // Send the email with the Excel file as an attachment
+                    const transporter = nodemailer_1.default.createTransport({
+                        host: "smtp-relay.brevo.com",
+                        port: 587,
+                        secure: false,
+                        auth: {
+                            user: process.env.LOGIN,
+                            pass: process.env.SMTPPASSWORD,
+                        },
                     });
-                }
-                sendEmail();
+                    function sendEmail() {
+                        return __awaiter(this, void 0, void 0, function* () {
+                            const info = yield transporter.sendMail({
+                                from: `${process.env.LOGIN}`,
+                                to: `${process.env.LOGIN}`,
+                                subject: `${monthNames[curMonth]} - ${curYear}`,
+                                attachments: [
+                                    {
+                                        filename: `${monthNames[curMonth]} - ${curYear}.xlsx`,
+                                        content: tempFile,
+                                    },
+                                ],
+                            });
+                        });
+                    }
+                    sendEmail();
+                });
             }
         }
         catch (e) {

@@ -112,7 +112,6 @@ const monthSalary = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     var _a;
     try {
         let { curYear, curMonth } = (0, dates_1.dates)();
-        // console.log(curMonth);
         const durationSum = yield appModel_1.Year.aggregate([
             { $match: { year: { $eq: curYear } } },
             { $unwind: "$months" },
@@ -149,8 +148,6 @@ const monthSalary = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         });
     }
     catch (e) {
-        // res.status((e as BaseError).statusCode).json({
-        // console.log(e, "e");
         res.status(404).json({
             status: "Failed",
             body: {
