@@ -64,11 +64,10 @@ const clockIn = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
     catch (e) {
-        // need to check the current status code and how to create the right error
         res.status(404).json({
             status: "Failed",
             body: {
-                message: e.message,
+                message: "Something went wrong",
             },
         });
     }
@@ -100,7 +99,7 @@ const clockOut = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(404).json({
             status: "Failed",
             body: {
-                message: e.message,
+                message: "Something went wrong",
             },
         });
     }
@@ -150,7 +149,7 @@ const monthSalary = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         res.status(404).json({
             status: "Failed",
             body: {
-                message: e.message,
+                message: "Something went wrong",
             },
         });
     }

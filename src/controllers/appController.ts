@@ -55,11 +55,10 @@ export const clockIn = async (req: Request, res: Response) => {
       },
     });
   } catch (e) {
-    // need to check the current status code and how to create the right error
     res.status(404).json({
       status: "Failed",
       body: {
-        message: (e as Error).message,
+        message: "Something went wrong",
       },
     });
   }
@@ -92,7 +91,7 @@ export const clockOut = async (req: Request, res: Response) => {
     res.status(404).json({
       status: "Failed",
       body: {
-        message: (e as Error).message,
+        message: "Something went wrong",
       },
     });
   }
@@ -146,7 +145,7 @@ export const monthSalary = async (req: Request, res: Response) => {
     res.status(404).json({
       status: "Failed",
       body: {
-        message: (e as Error).message,
+        message: "Something went wrong",
       },
     });
   }
