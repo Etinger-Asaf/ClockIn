@@ -19,11 +19,11 @@ const monthNames = [
 function dates() {
     const date = new Date();
     const curYear = date.getFullYear();
-    const curMonth = date.getMonth();
+    const curMonth = date.getMonth() + 1;
     const curDay = date.getDate();
     const day = date.getDay();
     const namedDay = dayNames[day];
-    const namedMonth = monthNames[curMonth];
+    const namedMonth = monthNames[curMonth - 1];
     const timeMilisecond = date.getTime();
     return { curYear, curMonth, curDay, namedDay, timeMilisecond, namedMonth };
 }
