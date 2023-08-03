@@ -5,4 +5,5 @@ node_modules/
 .config
 *.xlsx
 *.test.ts
+*.test.js
 selfExplentions.txt
