@@ -6,8 +6,7 @@
   "scripts": {
     "jest": "npx jest",
     "start:dev": "npx nodemon",
-    "start:build": "npx tsc",
-    "start": "node dist/main.js"
+    "start:build": "npx tsc"
   },
   "author": "",
   "license": "ISC",
