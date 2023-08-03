@@ -28,9 +28,7 @@ export const clockIn = async (req: Request, res: Response) => {
 
       // month is not exists, we create a new month
       if (!foundMonth) {
-        console.log("no month");
         foundMonth = yearCollection.months.create({ name: namedMonth, month: curMonth });
-        console.log(foundMonth);
         yearCollection.months.push(foundMonth);
 
         // Not sure it need to be here, when a month is missing it means we have change a month
@@ -41,7 +39,7 @@ export const clockIn = async (req: Request, res: Response) => {
       if (foundMonth) {
         for (let day in foundMonth.days) {
           if (foundMonth.days[day].number === curDay) {
-            throw new BaseError(400, "This shift has already started", true);
+            throw new Error("This shift has already started");
           }
         }
       }
@@ -61,7 +59,7 @@ export const clockIn = async (req: Request, res: Response) => {
     res.status(404).json({
       status: "Failed",
       body: {
-        message: "Something went wrong with the ClockIn API",
+        message: (e as Error).message,
       },
     });
   }
@@ -94,7 +92,7 @@ export const clockOut = async (req: Request, res: Response) => {
     res.status(404).json({
       status: "Failed",
       body: {
-        message: "Something went wrong with the ClockOut API",
+        message: (e as Error).message,
       },
     });
   }
@@ -123,7 +121,8 @@ export const monthSalary = async (req: Request, res: Response) => {
     const month = year?.months.filter((obj) => obj.month === curMonth);
     const days = month?.[0]?.days.length;
 
-    if (!totalDuration || !days) throw new BaseError(500, `Days or Duration were missing`, false);
+    // if (!totalDuration || !days) throw new BaseError(500, `Days or Duration were missing`, false);
+    if (!totalDuration || !days) throw new Error(`Days or Duration were missing`);
 
     const { salary, hours, minutes, transport, socialSecurity, pension, irs, health, neto } =
       calculateSalaryAndTime(totalDuration, days);
@@ -147,7 +146,7 @@ export const monthSalary = async (req: Request, res: Response) => {
     res.status(404).json({
       status: "Failed",
       body: {
-        message: "Something went wrong in the monthSalary API",
+        message: (e as Error).message,
       },
     });
   }

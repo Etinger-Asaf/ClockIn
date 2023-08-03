@@ -37,7 +37,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const XLSX = __importStar(require("xlsx"));
-const baseError_1 = __importDefault(require("../baseError"));
 const appModel_1 = require("../models/appModel");
 const fs = __importStar(require("fs"));
 XLSX.set_fs(fs);
@@ -157,9 +156,8 @@ function createMonthSumFile(curMonth, curYear) {
             }
         }
         catch (e) {
-            // console.log(e, "This error is from the monthSum file");
-            const newError = new baseError_1.default(404, "Something went wrong with the mailer", false);
-            throw newError;
+            console.log(e.message, "This error is from the monthSum file");
+            throw new Error("Something went wrong with the mailer or excelJS");
         }
     });
 }

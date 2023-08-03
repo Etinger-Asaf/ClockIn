@@ -128,9 +128,8 @@ async function createMonthSumFile(curMonth: number, curYear: number): Promise<vo
       });
     }
   } catch (e) {
-    // console.log(e, "This error is from the monthSum file");
-    const newError = new BaseError(404, "Something went wrong with the mailer", false);
-    throw newError;
+    console.log((e as Error).message, "This error is from the monthSum file");
+    throw new Error("Something went wrong with the mailer or excelJS");
   }
 }
 

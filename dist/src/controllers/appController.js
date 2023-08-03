@@ -40,9 +40,7 @@ const clockIn = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             let foundMonth = yearCollection.months.find((obj) => obj.month === curMonth);
             // month is not exists, we create a new month
             if (!foundMonth) {
-                console.log("no month");
                 foundMonth = yearCollection.months.create({ name: namedMonth, month: curMonth });
-                console.log(foundMonth);
                 yearCollection.months.push(foundMonth);
                 // Not sure it need to be here, when a month is missing it means we have change a month
                 (0, monthSum_1.default)(curMonth, curYear);
@@ -51,7 +49,7 @@ const clockIn = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             if (foundMonth) {
                 for (let day in foundMonth.days) {
                     if (foundMonth.days[day].number === curDay) {
-                        throw new baseError_1.default(400, "This shift has already started", true);
+                        throw new Error("This shift has already started");
                     }
                 }
             }
@@ -70,7 +68,7 @@ const clockIn = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(404).json({
             status: "Failed",
             body: {
-                message: "Something went wrong with the ClockIn API",
+                message: e.message,
             },
         });
     }
@@ -102,7 +100,7 @@ const clockOut = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(404).json({
             status: "Failed",
             body: {
-                message: "Something went wrong with the ClockOut API",
+                message: e.message,
             },
         });
     }
@@ -128,8 +126,9 @@ const monthSalary = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const year = yield appModel_1.Year.findOne({ year: curYear });
         const month = year === null || year === void 0 ? void 0 : year.months.filter((obj) => obj.month === curMonth);
         const days = (_a = month === null || month === void 0 ? void 0 : month[0]) === null || _a === void 0 ? void 0 : _a.days.length;
+        // if (!totalDuration || !days) throw new BaseError(500, `Days or Duration were missing`, false);
         if (!totalDuration || !days)
-            throw new baseError_1.default(500, `Days or Duration were missing`, false);
+            throw new Error(`Days or Duration were missing`);
         const { salary, hours, minutes, transport, socialSecurity, pension, irs, health, neto } = (0, salary_1.default)(totalDuration, days);
         res.status(200).json({
             status: "success",
@@ -151,7 +150,7 @@ const monthSalary = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         res.status(404).json({
             status: "Failed",
             body: {
-                message: "Something went wrong in the monthSalary API",
+                message: e.message,
             },
         });
     }
